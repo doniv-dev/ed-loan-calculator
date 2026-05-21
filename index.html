@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Education Loan Comparator — India</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --primary: #1d4ed8;
+      --primary-light: #dbeafe;
+      --text: #1e293b;
+      --muted: #64748b;
+      --green: #065f46;
+      --green-bg: #d1fae5;
+      --amber: #92400e;
+      --amber-bg: #fef3c7;
+      --red: #991b1b;
+      --red-bg: #fee2e2;
+      --radius: 14px;
+      --shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f2b6b 0%, #1e3a8a 50%, #312e81 100%);
+      color: #fff;
+      padding: 2rem 1.5rem 1.75rem;
+      text-align: center;
+    }
+    header h1 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; letter-spacing: -.02em; }
+    header p  { margin-top: .35rem; opacity: .8; font-size: .9rem; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 1.5rem; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      padding-bottom: .75rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .fg { display: flex; flex-direction: column; gap: .35rem; }
+    .fg label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+    }
+    .fg .hint {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: .1rem;
+    }
+    .amount-label {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: .15rem;
+      min-height: 1.1em;
+      letter-spacing: -.01em;
+    }
+    /* ── UNIT COMBO (Crore / Lac / Thousand) ── */
+    .has-unit input { padding-right: 96px; }
+    .has-pre.has-unit input { padding-left: 1.7rem; padding-right: 96px; }
+    .unit-sel {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      border: none;
+      border-left: 1.5px solid var(--border);
+      border-radius: 0 8px 8px 0;
+      padding: 0 .5rem 0 .5rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: #eef2ff;
+      cursor: pointer;
+      outline: none;
+      width: 90px;
+      appearance: auto;
+      transition: background .15s;
+    }
+    .unit-sel:focus, .unit-sel:hover { background: #dbeafe; }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap .pre,
+    .input-wrap .suf {
+      position: absolute;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      pointer-events: none;
+      user-select: none;
+    }
+    .input-wrap .pre { left: .75rem; }
+    .input-wrap .suf { right: .75rem; }
+    .fg input, .fg select:not(.unit-sel) {
+      width: 100%;
+      padding: .6rem .85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .95rem;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .fg input:focus, .fg select:not(.unit-sel):focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+    }
+    .has-pre input  { padding-left: 1.7rem; }
+    .has-suf input  { padding-right: 2.8rem; }
+
+    /* ── CALCULATE BTN ── */
+    .btn-calc {
+      width: 100%;
+      padding: .8rem;
+      background: linear-gradient(135deg, #1d4ed8, #4f46e5);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 1rem;
+      letter-spacing: .01em;
+      transition: opacity .15s, transform .12s;
+    }
+    .btn-calc:hover  { opacity: .92; transform: translateY(-1px); }
+    .btn-calc:active { transform: translateY(0); }
+    .btn-calc.stale {
+      background: linear-gradient(135deg, #b45309, #d97706);
+      animation: pulse-stale 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-stale {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); }
+      50%       { box-shadow: 0 0 0 7px rgba(217,119,6,0); }
+    }
+
+    /* ── TAX INFO ── */
+    .tax-box {
+      margin-top: 1.1rem;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .tax-box-header {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: .75rem;
+    }
+    .tax-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+    .tax-metric {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      padding: .6rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .tax-metric .val { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+    .tax-metric .lbl { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-top: .15rem; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .25rem .7rem;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .pill.old   { background: var(--amber-bg); color: var(--amber); }
+    .pill.new   { background: var(--green-bg); color: var(--green); }
+    .pill.best  { background: var(--green-bg); color: var(--green); }
+    .pill.worst { background: var(--red-bg);   color: var(--red);   }
+    .pill.mid   { background: var(--amber-bg); color: var(--amber); }
+
+    /* ── SCENARIO GRID ── */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .85rem;
+    }
+    .section-head h2 { font-size: 1rem; font-weight: 700; }
+    .scenarios { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1rem; }
+    .sc-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      position: relative;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .sc-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .sc-card.best    { border-color: #10b981; }
+    .sc-card.mid     { border-color: #f59e0b; }
+    .sc-card.worst   { border-color: #ef4444; }
+    .sc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .sc-name { font-size: 1rem; font-weight: 800; }
+    .sc-sub  { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: .48rem 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: .85rem;
+    }
+    .row:last-of-type { border-bottom: none; }
+    .row .lbl { color: var(--muted); }
+    .row .val { font-weight: 600; }
+    .net-box {
+      margin-top: .9rem;
+      padding: .875rem;
+      border-radius: 9px;
+      background: var(--bg);
+    }
+    .net-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .net-value { font-size: 1.55rem; font-weight: 800; margin-top: .15rem; line-height: 1; }
+    .net-value.best  { color: #065f46; }
+    .net-value.mid   { color: #92400e; }
+    .net-value.worst { color: #991b1b; }
+    .bar-track { height: 6px; background: #e2e8f0; border-radius: 4px; margin-top: .45rem; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .bar-fill.best  { background: #10b981; }
+    .bar-fill.mid   { background: #f59e0b; }
+    .bar-fill.worst { background: #ef4444; }
+    .pct-note { font-size: .7rem; color: var(--muted); margin-top: .25rem; }
+
+    /* ── GAP ── */
+    .gap { margin-top: 1.5rem; }
+
+    /* ── CANVAS CHART ── */
+    canvas { display: block; }
+
+    /* ── REGIME COMPARISON ── */
+    .regime-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+    .regime-card {
+      padding: 1rem;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      text-align: center;
+    }
+    .regime-card.rec { border-color: var(--primary); background: var(--primary-light); }
+    .regime-card h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .5rem; }
+    .regime-card .amount { font-size: 1.25rem; font-weight: 800; }
+    .regime-card .note { font-size: .75rem; color: var(--muted); margin-top: .2rem; }
+    .info-note {
+      margin-top: 1rem;
+      padding: .75rem 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 3px solid var(--primary);
+      font-size: .78rem;
+      color: var(--muted);
+    }
+    .info-note strong { color: var(--text); }
+
+    /* ── 80E TABLE ── */
+    .mini-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: .75rem; }
+    .mini-table th { background: #f1f5f9; padding: .45rem .75rem; text-align: right; font-weight: 600; }
+    .mini-table th:first-child { text-align: left; }
+    .mini-table td { padding: .4rem .75rem; text-align: right; border-bottom: 1px solid var(--border); }
+    .mini-table td:first-child { text-align: left; }
+    .mini-table tr.total td { font-weight: 700; background: #f8fafc; }
+    .saving-td { color: #065f46; font-weight: 700; }
+
+    /* ── AMORT TABLE ── */
+    .tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    .tab {
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: none;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .tbl-scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: 9px; }
+    .amort { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    .amort thead th {
+      background: var(--primary);
+      color: #fff;
+      padding: .55rem .8rem;
+      text-align: right;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .amort thead th:first-child { text-align: center; }
+    .amort td { padding: .45rem .8rem; text-align: right; border-bottom: 1px solid var(--border); }
+    .amort td:first-child { text-align: center; font-weight: 600; }
+    .amort tr:nth-child(even) { background: #f8fafc; }
+    .amort tr.mphase td { background: #fef9ee; }
+    .ph-tag {
+      display: inline-block;
+      font-size: .65rem;
+      padding: .12rem .45rem;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .ph-tag.m { background: var(--amber-bg); color: var(--amber); }
+    .ph-tag.r { background: var(--primary-light); color: var(--primary); }
+    .tbl-footer { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .8rem; color: var(--muted); margin-top: .65rem; }
+    .tbl-footer strong { color: var(--text); }
+
+    /* ── PREPAY ── */
+    .prepay-input {
+      width: 88px;
+      padding: .28rem .45rem;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: .78rem;
+      text-align: right;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .prepay-input:focus { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.1); }
+    .prepay-input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+    .amort tr.prepaid td { background: #f5f3ff !important; }
+    .amort td.prepay-val { color: #6d28d9; font-weight: 700; font-size: .8rem; }
+    .amort td.emi-changed { color: var(--primary); font-weight: 700; }
+    .savings-banner {
+      margin-top: .85rem;
+      padding: .85rem 1rem;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border: 1px solid #6ee7b7;
+      border-radius: 9px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    .sav-item { text-align: center; min-width: 90px; }
+    .sav-val { font-size: 1.1rem; font-weight: 800; color: #065f46; }
+    .sav-lbl { font-size: .68rem; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; margin-top: .1rem; }
+    .reset-prepay {
+      margin-left: auto;
+      padding: .38rem .85rem;
+      background: #fff;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all .15s;
+    }
+    .reset-prepay:hover { border-color: #ef4444; color: #ef4444; }
+    .export-btn {
+      padding: .28rem .75rem;
+      font-size: .75rem;
+      border: 1px solid #2563eb;
+      border-radius: 6px;
+      background: #fff;
+      color: #2563eb;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      margin-left: auto;
+    }
+    .export-btn:hover { background: #2563eb; color: #fff; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 620px) {
+      .form-grid   { grid-template-columns: 1fr 1fr; }
+      .scenarios   { grid-template-columns: 1fr; }
+      .regime-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Education Loan Comparator</h1>
+  <p>Compare repayment strategies · Section 80E Tax Savings · Indian Income Tax Slabs (FY 2025-26)</p>
+</header>
+
+<div class="wrap">
+
+  <!-- ── INPUT CARD ── -->
+  <div class="card">
+    <div class="card-title">📊 Enter Loan &amp; Income Details</div>
+    <div class="form-grid">
+
+      <div class="fg">
+        <label>Annual Gross Income</label>
+        <div class="input-wrap has-pre has-unit">
+          <span class="pre">₹</span>
+          <input type="number" id="incomeVal" value="1.5" min="0" step="0.01"
+            oninput="onAmtChange('income')" />
+          <select id="incomeUnit" class="unit-sel" onchange="onAmtChange('income')">
+            <option value="10000000" selected>Crore</option>
+            <option value="100000">Lac</option>
+            <option value="1000">Thousand</option>
+          </select>
+        </div>
+        <span class="amount-label" id="incomeLabel">₹1,50,00,000</span>
+      </div>
+
+      <div class="fg">
+        <label>Loan Amount Required</label>
+        <div class="input-wrap has-pre has-unit">
+          <span class="pre">₹</span>
+          <input type="number" id="loanAmtVal" value="1.5" min="0" step="0.01"
+            oninput="onAmtChange('loanAmt')" />
+          <select id="loanAmtUnit" class="unit-sel" onchange="onAmtChange('loanAmt')">
+            <option value="10000000" selected>Crore</option>
+            <option value="100000">Lac</option>
+            <option value="1000">Thousand</option>
+          </select>
+        </div>
+        <span class="amount-label" id="loanAmtLabel">₹1,50,00,000</span>
+      </div>
+
+      <div class="fg">
+        <label>Annual Interest Rate</label>
+        <div class="input-wrap has-suf">
+          <span class="suf">% p.a.</span>
+          <input type="number" id="rate" value="8.5" min="1" max="30" step="0.1" />
+        </div>
+        <span class="hint">Typical: 8–11% for edu loans</span>
+      </div>
+
+      <div class="fg">
+        <label>Course Duration</label>
+        <div class="input-wrap has-suf">
+          <span class="suf">yrs</span>
+          <input type="number" id="courseDur" value="3" min="0" max="10" step="0.5" />
+        </div>
+        <span class="hint">Moratorium = course + 1 yr</span>
+      </div>
+
+      <div class="fg">
+        <label>Repayment Tenure</label>
+        <div class="input-wrap has-suf">
+          <span class="suf">yrs</span>
+          <input type="number" id="repayTenure" min="1" max="30" step="1" />
+        </div>
+        <span class="hint">EMI period after moratorium (auto: 8 − moratorium years)</span>
+      </div>
+
+      <div class="fg">
+        <label>Loan Start Date</label>
+        <div style="display:flex;gap:.5rem">
+          <div class="input-wrap" style="flex:1">
+            <select id="loanStartMonth">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="input-wrap" style="flex:0 0 5.5rem">
+            <input type="number" id="loanStartYear" min="2000" max="2060" step="1" />
+          </div>
+        </div>
+        <span class="hint">Used for calendar labels in schedule</span>
+      </div>
+
+      <div class="fg">
+        <label>Tax Regime</label>
+        <div class="input-wrap">
+          <select id="taxRegime">
+            <option value="auto">⚡ Auto-recommend</option>
+            <option value="old" selected>🏛 Old Regime (with 80E)</option>
+            <option value="new">📋 New Regime (no 80E)</option>
+          </select>
+        </div>
+        <span class="hint">80E saves tax in old regime</span>
+      </div>
+
+      <div class="fg">
+        <label>Investment Return % p.a.</label>
+        <div class="input-wrap">
+          <input id="invReturn" type="number" value="6" min="0" max="30" step="0.5" />
+        </div>
+        <span class="hint">Expected return if you invest the loan amount (e.g. 10% equity, 7% FD)</span>
+      </div>
+
+    </div><!-- /form-grid -->
+
+    <!-- Live tax summary -->
+    <div class="tax-box" id="taxBox" style="display:none">
+      <div class="tax-box-header">
+        <span>📌 Auto Tax Calculation</span>
+        <span id="regimePill"></span>
+      </div>
+      <div class="tax-metrics" id="taxMetrics"></div>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">Calculate &amp; Compare Scenarios →</button>
+  </div><!-- /input card -->
+
+  <!-- ── RESULTS (hidden until calc) ── -->
+  <div id="results" style="display:none">
+
+    <!-- Scenario Cards -->
+    <div class="gap">
+      <div class="section-head">
+        <h2>💰 Repayment Scenarios</h2>
+        <span id="activeRegimePill"></span>
+      </div>
+      <div class="scenarios" id="scenariosGrid"></div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card gap">
+      <div class="card-title">📈 Cost Comparison Chart</div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Tax Regime Analysis -->
+    <div class="card gap" id="regimeSection">
+      <div class="card-title">💡 Tax Regime Analysis (Section 80E)</div>
+      <div id="regimeContent"></div>
+    </div>
+
+    <!-- Amortization -->
+    <div class="card gap">
+      <div class="card-title">📋 Monthly Amortization Schedule</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('immediate',this)">Immediate EMI</button>
+        <button class="tab" onclick="switchTab('psi',this)">PSI + EMI</button>
+        <button class="tab" onclick="switchTab('deferred',this)">Full Deferral</button>
+      </div>
+      <div id="amortContainer"></div>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /wrap -->
+
+<script>
+/* ═══════════════════════════════════════════════
+   CONSTANTS & TAX SLABS (FY 2025-26)
+═══════════════════════════════════════════════ */
+
+// Each entry: [lowerBound, rate]
+const OLD_SLABS = [[0,0],[250000,.05],[500000,.20],[1000000,.30]];
+const NEW_SLABS = [[0,0],[400000,.05],[800000,.10],[1200000,.15],
+                   [1600000,.20],[2000000,.25],[2400000,.30]];
+
+const STD_DED = { old: 50000, new: 75000 };
+
+function taxableIncome(gross, regime) {
+  return Math.max(0, gross - STD_DED[regime]);
+}
+
+// Surcharge rates (FY 2025-26)
+// Old regime: 10% (>50L-1Cr), 15% (>1Cr-2Cr), 25% (>2Cr-5Cr), 37% (>5Cr)
+// New regime:  same tiers but max capped at 25% (Budget 2023)
+function surchargeRate(ti, regime) {
+  if (ti <= 5000000)                       return 0;
+  if (ti <= 10000000)                      return 0.10;
+  if (ti <= 20000000)                      return 0.15;
+  if (ti <= 50000000)                      return 0.25;
+  return regime === 'new' ? 0.25 : 0.37;   // >5 Cr
+}
+
+// Returns full breakdown: baseTax, rebate, taxAfterRebate, surcharge, cess, total
+function taxBreakdown(ti, regime) {
+  const slabs = regime === 'old' ? OLD_SLABS : NEW_SLABS;
+  let baseTax = 0;
+  for (let i = 0; i < slabs.length; i++) {
+    const lo   = slabs[i][0];
+    const hi   = slabs[i+1] ? slabs[i+1][0] : Infinity;
+    const rate = slabs[i][1];
+    if (ti <= lo) break;
+    baseTax += (Math.min(ti, hi) - lo) * rate;
+  }
+  // 87A Rebate (FY 2025-26)
+  let rebate = 0;
+  if (regime === 'old' && ti <= 500000)  rebate = Math.min(baseTax, 12500);
+  if (regime === 'new' && ti <= 1200000) rebate = Math.min(baseTax, 60000);
+  const taxAfterRebate = Math.max(0, baseTax - rebate);
+  // Surcharge on tax after rebate
+  const sRate     = surchargeRate(ti, regime);
+  const surcharge = taxAfterRebate * sRate;
+  // 4% Health & Education Cess on (tax + surcharge)
+  const cess  = (taxAfterRebate + surcharge) * 0.04;
+  const total = Math.round(taxAfterRebate + surcharge + cess);
+  return { baseTax, rebate, taxAfterRebate, sRate, surcharge, cess, total };
+}
+
+function computeTax(ti, regime) {
+  return taxBreakdown(ti, regime).total;
+}
+
+function marginalRate(gross, regime) {
+  const ti = taxableIncome(gross, regime);
+  const slabs = regime === 'old' ? OLD_SLABS : NEW_SLABS;
+  let slabRate = 0;
+  for (const [lo, r] of slabs) { if (ti > lo) slabRate = r; }
+  // Effective marginal rate = slab * (1 + surcharge) * 1.04 (cess)
+  const sr = surchargeRate(ti, regime);
+  return slabRate * (1 + sr) * 1.04;
+}
+
+function taxSaving80E(gross, interestPaid, regime) {
+  if (regime === 'new') return 0;
+  const ti = taxableIncome(gross, regime);
+  return Math.max(0, computeTax(ti, regime) - computeTax(Math.max(0, ti - interestPaid), regime));
+}
+
+/* ═══════════════════════════════════════════════
+   FORMATTING
+═══════════════════════════════════════════════ */
+function inr(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function inrK(n) {
+  n = Math.round(n);
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(2) + ' Cr';
+  if (n >= 100000)   return '₹' + (n/100000).toFixed(2) + ' L';
+  if (n >= 1000)     return '₹' + (n/1000).toFixed(1) + 'K';
+  return '₹' + n.toLocaleString('en-IN');
+}
+function pct(r) { return (r*100).toFixed(1) + '%'; }
+
+/* ═══════════════════════════════════════════════
+   CALENDAR DATE HELPER
+═══════════════════════════════════════════════ */
+const _MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function schedMonthLabel(startYear, startMonth, monthOffset) {
+  // monthOffset is 0-based (row.month - 1)
+  const total = (startMonth - 1) + monthOffset;
+  return _MONTHS[total % 12] + ' ' + (startYear + Math.floor(total / 12));
+}
+
+/* ═══════════════════════════════════════════════
+   EMI FORMULA
+═══════════════════════════════════════════════ */
+function calcEMI(P, r, n) {
+  if (r === 0) return P / n;
+  return P * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+}
+
+/* ═══════════════════════════════════════════════
+   SCENARIO CALCULATORS
+═══════════════════════════════════════════════ */
+
+// Helper: active (disbursed) principal at a given moratorium month
+// Bank disburses P/numDisb at the start of each academic year (months 1,13,25,...)
+// Grace year and beyond: full P is active
+function activePrincipal(P, month, numDisb) {
+  return (Math.min(Math.ceil(month / 12), numDisb) / numDisb) * P;
+}
+
+// Scenario A: Immediate EMI — EMI starts from month 1, recalculated at each annual disbursement
+function calcImmediate(P, r, morM, repM, numDisb) {
+  const totalM = morM + repM;
+  const tranche = P / numDisb;
+  const sched = [];
+  let bal = 0, totalInt = 0, currentEMI = 0;
+  for (let i = 1; i <= totalM; i++) {
+    // New tranche disbursed at start of each academic year
+    if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) {
+      bal += tranche;
+      currentEMI = calcEMI(bal, r, totalM - i + 1);
+    }
+    const interest = bal * r;
+    const prin     = Math.min(currentEMI - interest, bal);
+    bal = Math.max(0, bal - prin);
+    totalInt += interest;
+    sched.push({ month: i, payment: currentEMI, prin, interest, bal, phase: i <= morM ? 'mor' : 'rep' });
+  }
+  return { sched, totalInt, emiDuring: currentEMI, emiAfter: currentEMI };
+}
+
+// Scenario B: PSI — pay interest-only on disbursed amount during moratorium, then EMI on remaining principal
+function calcPSI(P, r, morM, repM, numDisb) {
+  const sched = [];
+  let bal = 0, totalInt = 0;
+  for (let i = 1; i <= morM; i++) {
+    if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) bal += P / numDisb;
+    const interest = bal * r;
+    totalInt += interest;
+    sched.push({ month: i, payment: interest, prin: 0, interest, bal, phase: 'mor' });
+  }
+  // After moratorium: EMI on full P (all tranches disbursed)
+  const emiAmt = calcEMI(P, r, repM);
+  let repBal = P;
+  for (let i = 1; i <= repM; i++) {
+    const interest = repBal * r;
+    const prin     = emiAmt - interest;
+    repBal = Math.max(0, repBal - prin);
+    totalInt += interest;
+    sched.push({ month: morM + i, payment: emiAmt, prin, interest, bal: repBal, phase: 'rep' });
+  }
+  return { sched, totalInt, emiDuring: P * r, emiAfter: emiAmt };
+}
+
+// Scenario C: Full Deferral — no payment; interest on disbursed amount capitalizes each month
+function calcDeferred(P, r, morM, repM, numDisb) {
+  const sched = [];
+  let bal = 0;
+  for (let i = 1; i <= morM; i++) {
+    if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) bal += P / numDisb;
+    const accrued = bal * r;
+    bal += accrued;
+    sched.push({ month: i, payment: 0, prin: 0, interest: 0, accrued, bal, phase: 'mor' });
+  }
+  const capInterest = bal - P;
+  const emiAmt      = calcEMI(bal, r, repM);
+  let repInt = 0;
+  for (let i = 1; i <= repM; i++) {
+    const interest = bal * r;
+    const prin     = emiAmt - interest;
+    bal = Math.max(0, bal - prin);
+    repInt += interest;
+    sched.push({ month: morM + i, payment: emiAmt, prin, interest, bal, phase: 'rep' });
+  }
+  return { sched, totalInt: capInterest + repInt, emiDuring: 0, emiAfter: emiAmt, capInterest };
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION 80E TAX SAVINGS
+═══════════════════════════════════════════════ */
+// Map a schedule month (1-based) to Indian Financial Year start
+// Indian FY runs Apr–Mar; FY 2027 means Apr 2027 – Mar 2028
+function monthToFY(schedMonth, startYear, startMonth) {
+  const totalOffset = (startMonth - 1) + (schedMonth - 1); // 0-based months from Jan of startYear
+  const calMonth = (totalOffset % 12) + 1;   // 1–12
+  const calYear  = startYear + Math.floor(totalOffset / 12);
+  return calMonth >= 4 ? calYear : calYear - 1; // FY starts in April
+}
+function fyLabel(fy) { return 'FY ' + fy + '-' + String(fy + 1).slice(-2); }
+
+function calc80E(sched, gross, regime, startYear, startMonth) {
+  if (regime === 'new') return { total: 0, yearwise: [] };
+
+  // Group interest paid by Indian Financial Year
+  const byFY = {};
+  let firstFY = null;
+  for (const row of sched) {
+    if (row.payment > 0 && row.interest > 0) {
+      const fy = monthToFY(row.month, startYear, startMonth);
+      if (firstFY === null) firstFY = fy;
+      if (fy >= firstFY && fy <= firstFY + 7)          // 8 FY window
+        byFY[fy] = (byFY[fy] || 0) + row.interest;
+    }
+  }
+
+  let total = 0;
+  const yearwise = [];
+  if (firstFY !== null) {
+    for (let fy = firstFY; fy <= firstFY + 7; fy++) {
+      const interest = byFY[fy] || 0;
+      if (!interest) continue;
+      const saving = taxSaving80E(gross, interest, regime);
+      total += saving;
+      yearwise.push({ fy, label: fyLabel(fy), interest, saving });
+    }
+  }
+  return { total, yearwise };
+}
+
+/* ═══════════════════════════════════════════════
+   LIVE TAX DISPLAY (on income change)
+═══════════════════════════════════════════════ */
+function updateTaxBox() {
+  const gross = getFieldValue('income');
+  if (!gross) { document.getElementById('taxBox').style.display = 'none'; return; }
+
+  const regime = document.getElementById('taxRegime').value;
+  const tiOld = taxableIncome(gross, 'old');
+  const tiNew = taxableIncome(gross, 'new');
+  const bdOld = taxBreakdown(tiOld, 'old');
+  const bdNew = taxBreakdown(tiNew, 'new');
+  const rec   = (bdNew.total <= bdOld.total) ? 'new' : 'old';
+
+  document.getElementById('taxBox').style.display = 'block';
+  document.getElementById('regimePill').innerHTML =
+    `<span class="pill ${rec}">${rec==='old'?'🏛 Old Regime recommended':'📋 New Regime recommended'}</span>`;
+
+  const oldMR = marginalRate(gross, 'old');
+  const newMR = marginalRate(gross, 'new');
+
+  function bdRow(bd, label) {
+    const mr = label === 'old' ? oldMR : newMR;
+    return `
+      <div class="tax-metric">
+        <div class="val" style="font-size:.85rem">${pct(mr)}</div>
+        <div class="lbl">${label==='old'?'Old':'New'} Effective Rate</div>
+      </div>
+      <div class="tax-metric">
+        <div class="val">${inrK(bd.baseTax)}</div>
+        <div class="lbl">${label==='old'?'Old':'New'} Base Tax</div>
+      </div>
+      ${bd.rebate > 0 ? `<div class="tax-metric"><div class="val" style="color:#065f46">−${inrK(bd.rebate)}</div><div class="lbl">87A Rebate</div></div>` : ''}
+      ${bd.surcharge > 0 ? `<div class="tax-metric"><div class="val" style="color:#92400e">${inrK(bd.surcharge)}</div><div class="lbl">${pct(bd.sRate)} Surcharge</div></div>` : ''}
+      <div class="tax-metric"><div class="val" style="color:#64748b">${inrK(bd.cess)}</div><div class="lbl">4% Cess</div></div>
+      <div class="tax-metric"><div class="val">${inrK(bd.total)}</div><div class="lbl">${label==='old'?'Old':'New'} Total Tax</div></div>
+    `;
+  }
+
+  document.getElementById('taxMetrics').innerHTML = `
+    <div class="tax-metric" style="min-width:140px">
+      <div class="val">${inrK(gross)}</div><div class="lbl">Gross Income</div>
+    </div>
+    <div class="tax-metric" style="min-width:140px">
+      <div class="val">${inrK(tiOld)}</div><div class="lbl">Taxable (Old)</div>
+    </div>
+    ${bdRow(bdOld,'old')}
+    <div style="width:100%;height:1px;background:var(--border);margin:.25rem 0"></div>
+    <div class="tax-metric" style="min-width:140px">
+      <div class="val">${inrK(tiNew)}</div><div class="lbl">Taxable (New)</div>
+    </div>
+    ${bdRow(bdNew,'new')}
+    <div style="width:100%;height:1px;background:var(--border);margin:.25rem 0"></div>
+    <div class="tax-metric">
+      <div class="val" style="color:#065f46">${inrK(Math.abs(bdNew.total - bdOld.total))}</div>
+      <div class="lbl">${bdNew.total < bdOld.total ? 'New Regime Saves' : 'Old Regime Saves'}</div>
+    </div>
+  `;
+}
+
+document.getElementById('incomeVal').addEventListener('input',   updateTaxBox);
+document.getElementById('incomeUnit').addEventListener('change',  updateTaxBox);
+document.getElementById('taxRegime').addEventListener('change', updateTaxBox);
+
+/* ── STALE INDICATOR ── */
+const _calcBtn = document.querySelector('.btn-calc');
+const _btnOrig = _calcBtn.textContent;
+function markStale() {
+  if (document.getElementById('results').style.display === 'none') return;
+  _calcBtn.classList.add('stale');
+  _calcBtn.innerHTML = '⚠️ Inputs changed — Recalculate &rarr;';
+}
+function markFresh() {
+  _calcBtn.classList.remove('stale');
+  _calcBtn.innerHTML = 'Calculate &amp; Compare Scenarios &rarr;';
+}
+['incomeVal','incomeUnit','loanAmtVal','loanAmtUnit','rate','courseDur','repayTenure','taxRegime','invReturn']
+  .forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', markStale);
+  });
+// Loan start date only affects display labels — re-render amort without full recalculate
+['loanStartMonth','loanStartYear'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => {
+    if (document.getElementById('results').style.display !== 'none') renderAmort(_currentTab);
+  });
+});
+// Default loan start date = current month and year
+(function() {
+  const now = new Date();
+  document.getElementById('loanStartYear').value  = now.getFullYear();
+  document.getElementById('loanStartMonth').value = now.getMonth() + 1;
+})();
+// Repayment tenure default = max(1, 8 - (courseDur + 1)); auto-update on course change
+function updateRepayDefault() {
+  const cd = parseFloat(document.getElementById('courseDur').value) || 0;
+  document.getElementById('repayTenure').value = Math.max(1, 8 - (cd + 1));
+}
+updateRepayDefault();
+document.getElementById('courseDur').addEventListener('input', updateRepayDefault);
+
+/* ═══════════════════════════════════════════════
+   AMOUNT LABEL HELPERS
+═══════════════════════════════════════════════ */
+function getFieldValue(id) {
+  const v = parseFloat(document.getElementById(id + 'Val').value)  || 0;
+  const u = parseFloat(document.getElementById(id + 'Unit').value) || 1;
+  return v * u;
+}
+
+function onAmtChange(id) {
+  const v  = getFieldValue(id);
+  const el = document.getElementById(id + 'Label');
+  if (el) el.textContent = v > 0 ? '₹' + Math.round(v).toLocaleString('en-IN') : '';
+  if (id === 'income') updateTaxBox();
+}
+
+// Initialise labels and tax box for default values on page load
+onAmtChange('income');
+onAmtChange('loanAmt');
+updateTaxBox();
+
+/* ═══════════════════════════════════════════════
+   GLOBAL STATE
+═══════════════════════════════════════════════ */
+let _schedules   = {};
+let _currentTab  = 'immediate';
+let _prepayments = { immediate: {}, psi: {}, deferred: {} };
+let _loanParams  = {};
+let _calcState   = {}; // gross, regime, oldTax, newTax — stored for prepay refresh
+let _80eData     = {}; // 80E yearwise data per scenario; updated on calculate + prepay refresh
+const _TAB_NAMES = { immediate: 'Immediate EMI', psi: 'PSI + EMI', deferred: 'Full Deferral' };
+
+/* ── INVESTMENT GAINS HELPER ── */
+function calcInvGains(P, annualPct, totalMonths) {
+  if (!annualPct || annualPct <= 0) return 0;
+  const r = annualPct / 100 / 12;
+  return P * (Math.pow(1 + r, totalMonths) - 1);
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN CALCULATE
+═══════════════════════════════════════════════ */
+function calculate() {
+  markFresh();
+  const gross      = getFieldValue('income');
+  const P          = getFieldValue('loanAmt');
+  const annualRate = parseFloat(document.getElementById('rate').value)         || 8.5;
+  const courseDur  = parseFloat(document.getElementById('courseDur').value)    || 2;
+  const repayYrs   = parseInt(document.getElementById('repayTenure').value)    || 10;
+  const regimePref = document.getElementById('taxRegime').value;
+  const invReturn  = parseFloat(document.getElementById('invReturn').value)    || 6;
+
+  if (P <= 0)    { alert('Please enter a valid loan amount.'); return; }
+  if (repayYrs < 1) { alert('Repayment tenure must be at least 1 year.'); return; }
+
+  const r     = annualRate / 100 / 12;
+  const morM  = Math.round((courseDur + 1) * 12);  // moratorium = course + 1 yr
+  const repM  = repayYrs * 12;
+
+  // Determine active regime
+  const oldTax = computeTax(taxableIncome(gross, 'old'), 'old');
+  const newTax = computeTax(taxableIncome(gross, 'new'), 'new');
+  const rec    = newTax <= oldTax ? 'new' : 'old';
+  const regime = regimePref === 'auto' ? rec : regimePref;
+
+  // Read loan start date
+  const loanStartYear  = parseInt(document.getElementById('loanStartYear').value)  || new Date().getFullYear();
+  const loanStartMonth = parseInt(document.getElementById('loanStartMonth').value) || (new Date().getMonth() + 1);
+
+  // Store for prepayment refresh
+  _calcState = { gross, regime, oldTax, newTax, invReturn, loanStartYear, loanStartMonth };
+
+  // Number of annual disbursements = course duration in years
+  const numDisb = Math.max(1, Math.round(courseDur));
+
+  // Run calculators
+  const immData = calcImmediate(P, r, morM, repM, numDisb);
+  const psiData = calcPSI(P, r, morM, repM, numDisb);
+  const defData = calcDeferred(P, r, morM, repM, numDisb);
+  _schedules   = { immediate: immData, psi: psiData, deferred: defData };
+  _loanParams  = { r, morM, repM, P, numDisb };
+  _prepayments = { immediate: {}, psi: {}, deferred: {} };
+
+  // 80E savings (grouped by Indian Financial Year from actual loan start date)
+  const imm80E = calc80E(immData.sched, gross, regime, loanStartYear, loanStartMonth);
+  const psi80E = calc80E(psiData.sched, gross, regime, loanStartYear, loanStartMonth);
+  const def80E = calc80E(defData.sched, gross, regime, loanStartYear, loanStartMonth);
+  _80eData = { immediate: imm80E, psi: psi80E, deferred: def80E };
+
+  const totalM = morM + repM;
+  const scenarios = [
+    {
+      key: 'immediate', name: 'Immediate EMI',
+      sub: `EMI from month 2, no moratorium (${Math.round(morM/12)+repayYrs} yr term)`,
+      ...immData, baseTotalInt: immData.totalInt, baseEmiAfter: immData.emiAfter, totalPrepaid: 0,
+      savings: imm80E.total, netInt: immData.totalInt - imm80E.total,
+      invGains: calcInvGains(P, invReturn, totalM), invReturn
+    },
+    {
+      key: 'psi', name: 'PSI + EMI',
+      sub: `Interest only during moratorium (${Math.round(morM/12)} yrs), then EMI`,
+      ...psiData, baseTotalInt: psiData.totalInt, baseEmiAfter: psiData.emiAfter, totalPrepaid: 0,
+      savings: psi80E.total, netInt: psiData.totalInt - psi80E.total,
+      invGains: calcInvGains(P, invReturn, totalM), invReturn
+    },
+    {
+      key: 'deferred', name: 'Full Deferral',
+      sub: `No payment during moratorium, EMI on capitalized principal`,
+      ...defData, baseTotalInt: defData.totalInt, baseEmiAfter: defData.emiAfter, totalPrepaid: 0,
+      savings: def80E.total, netInt: defData.totalInt - def80E.total,
+      invGains: calcInvGains(P, invReturn, totalM), invReturn
+    }
+  ];
+
+  // Rank by net interest
+  const sorted = [...scenarios].sort((a,b) => a.netInt - b.netInt);
+  scenarios.forEach(s => { s.rank = sorted.findIndex(x => x.key === s.key); });
+
+  // Render
+  renderCards(scenarios, P, morM, repM, regime);
+  renderRegime();
+  renderAmort('immediate');
+  _currentTab = 'immediate';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+
+  document.getElementById('activeRegimePill').innerHTML =
+    `<span class="pill ${regime}">${regime==='old'?'🏛 Old Regime (80E active)':'📋 New Regime (no 80E)'}</span>`;
+
+  const results = document.getElementById('results');
+  results.style.display = 'block';
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Defer chart until after display:block is laid out so clientWidth is correct
+  requestAnimationFrame(() => renderChart(scenarios, P));
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER SCENARIO CARDS
+═══════════════════════════════════════════════ */
+function renderCards(scenarios, P, morM, repM, regime) {
+  const cls   = ['best','mid','worst'];
+  const label = ['✅ Cheapest','⚠️ Middle','🔴 Most Expensive'];
+
+  let html = '';
+  for (const s of scenarios) {
+    const c              = cls[s.rank];
+    const totalPaid      = P + s.totalInt;
+    const emiChanged     = s.totalPrepaid > 0 && Math.round(s.emiAfter) !== Math.round(s.baseEmiAfter);
+    const totalChanged   = s.totalPrepaid > 0;
+    html += `
+    <div class="sc-card ${c}">
+      <div class="sc-head">
+        <div>
+          <div class="sc-name">${s.name}</div>
+          <div class="sc-sub">${s.sub}</div>
+        </div>
+        <span class="pill ${c}">${label[s.rank]}</span>
+      </div>
+
+      <div class="row">
+        <span class="lbl">Payment during moratorium (${Math.round(morM/12)} yrs)</span>
+        <span class="val">${s.emiDuring > 0 ? inr(s.emiDuring)+'/mo' : '<span style="color:var(--muted)">—</span>'}</span>
+      </div>
+      <div class="row">
+        <span class="lbl">EMI after moratorium</span>
+        <span class="val">${emiChanged
+          ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.82em">${inr(s.baseEmiAfter)}/mo</span> <strong>${inr(s.emiAfter)}/mo</strong>`
+          : `${inr(s.emiAfter)}/mo`}</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Principal</span>
+        <span class="val">${inr(P)}</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Total Interest (gross)</span>
+        <span class="val">${totalChanged
+          ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.82em">${inr(s.baseTotalInt)}</span> <strong>${inr(s.totalInt)}</strong>`
+          : inr(s.totalInt)}</span>
+      </div>
+      ${s.capInterest ? `<div class="row">
+        <span class="lbl">of which: capitalized interest</span>
+        <span class="val" style="color:var(--red)">${inr(s.capInterest)}</span>
+      </div>` : ''}
+      ${regime==='old' ? `<div class="row">
+        <span class="lbl">Section 80E tax savings</span>
+        <span class="val" style="color:var(--green)">−${inr(s.savings)}</span>
+      </div>` : ''}
+      ${totalChanged ? `
+      <div class="row">
+        <span class="lbl" style="color:#6d28d9">Total Prepaid (principal)</span>
+        <span class="val" style="color:#6d28d9">${inr(s.totalPrepaid)}</span>
+      </div>
+      <div class="row">
+        <span class="lbl" style="color:var(--green)">Interest Saved (vs no prepay)</span>
+        <span class="val" style="color:var(--green)">−${inr(s.baseTotalInt - s.totalInt)}</span>
+      </div>` : ''}
+      <div class="row">
+        <span class="lbl">Total amount paid</span>
+        <span class="val">${totalChanged
+          ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.82em">${inr(P + s.baseTotalInt)}</span> <strong>${inr(totalPaid)}</strong>`
+          : inr(totalPaid)}</span>
+      </div>
+
+      <div class="net-box">
+        <div class="net-label">Net interest cost${regime==='old'?' (after 80E tax benefit)':''}</div>
+        <div class="net-value ${c}">${inr(s.netInt)}</div>
+        <div class="bar-track">
+          <div class="bar-fill ${c}" style="width:${Math.min(100,(s.totalInt/P)*100).toFixed(1)}%"></div>
+        </div>
+        <div class="pct-note">${((s.netInt/P)*100).toFixed(1)}% of principal · ${inrK(s.netInt - (scenarios.find(x=>x.rank===0)?.netInt||0))} ${s.rank===0?'(lowest)':'more than cheapest'}</div>
+      </div>
+
+      ${s.invGains > 0 ? (() => {
+        const adv = s.invGains - s.netInt;
+        const loanWins = adv >= 0;
+        const termYrs = ((morM + repM) / 12).toFixed(1);
+        return `
+      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)">
+        <div style="font-size:.68rem;font-weight:700;color:#475569;letter-spacing:.05em;margin-bottom:.35rem">📈 VS SELF-FUNDED (invest ₹P at ${s.invReturn}% for ${termYrs} yrs)</div>
+        <div class="row">
+          <span class="lbl">₹P investment growth</span>
+          <span class="val" style="color:var(--green)">+${inrK(s.invGains)}</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Loan net interest cost</span>
+          <span class="val" style="color:var(--red)">−${inrK(s.netInt)}</span>
+        </div>
+        <div class="row" style="font-weight:700">
+          <span class="lbl">Net advantage of taking loan</span>
+          <span class="val" style="color:${loanWins?'var(--green)':'var(--red)'}">
+            ${loanWins ? `+${inrK(adv)} 🏆 Loan wins` : `−${inrK(-adv)} Self-fund wins`}
+          </span>
+        </div>
+      </div>`;
+      })() : ''}
+    </div>`;
+  }
+  document.getElementById('scenariosGrid').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER CHART (Canvas)
+═══════════════════════════════════════════════ */
+function renderChart(scenarios, P) {
+  const canvas  = document.getElementById('chart');
+  const dpr     = window.devicePixelRatio || 1;
+  const parentW = canvas.parentElement.clientWidth - 48;
+  const H_CSS   = 340;
+  canvas.width  = parentW * dpr;
+  canvas.height = H_CSS * dpr;
+  canvas.style.width  = parentW + 'px';
+  canvas.style.height = H_CSS + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = parentW, H = H_CSS;
+
+  const pad = { top: 48, right: 24, bottom: 86, left: 80 };
+  const cW  = W - pad.left - pad.right;
+  const cH  = H - pad.top  - pad.bottom;
+
+  // Gross costs & net costs
+  const gross  = scenarios.map(s => P + s.totalInt);
+  const net    = scenarios.map(s => P + s.netInt);
+  const maxVal = Math.max(...gross) * 1.12;
+
+  // ─── Grid & Y-axis ───
+  ctx.font = '11px -apple-system,BlinkMacSystemFont,sans-serif';
+  for (let i = 0; i <= 5; i++) {
+    const v  = maxVal * i / 5;
+    const yy = pad.top + cH - (v / maxVal) * cH;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth   = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, yy); ctx.lineTo(pad.left + cW, yy); ctx.stroke();
+    ctx.fillStyle   = '#94a3b8';
+    ctx.textAlign   = 'right';
+    ctx.fillText(inrK(v), pad.left - 6, yy + 4);
+  }
+
+  // ─── Bars ───
+  const scenColors  = ['#3b82f6','#10b981','#f59e0b'];
+  const netColors   = ['#93c5fd','#6ee7b7','#fcd34d'];
+  const groupW      = cW / 3;
+  const bW          = groupW * 0.32;
+
+  scenarios.forEach((s, i) => {
+    const gX    = pad.left + i * groupW + (groupW - 2*bW - 6) / 2;
+
+    // Gross bar
+    const gH = (gross[i] / maxVal) * cH;
+    const gY = pad.top + cH - gH;
+    ctx.fillStyle   = scenColors[i];
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(gX, gY, bW, gH);
+    ctx.globalAlpha = 1;
+
+    // Net bar
+    const nH = (net[i] / maxVal) * cH;
+    const nY = pad.top + cH - nH;
+    ctx.fillStyle = netColors[i];
+    ctx.fillRect(gX + bW + 6, nY, bW, nH);
+
+    // Labels above bars
+    ctx.fillStyle = '#1e293b';
+    ctx.textAlign = 'center';
+    ctx.font      = 'bold 10px -apple-system,sans-serif';
+    ctx.fillText(inrK(gross[i]), gX + bW/2, gY - 5);
+    ctx.font      = '9px -apple-system,sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText(inrK(net[i]),   gX + bW + 6 + bW/2, nY - 5);
+
+    // Scenario label
+    const midX = gX + bW + 3;
+    ctx.font      = '11px -apple-system,sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'center';
+    const words = s.name.split(' ');
+    words.forEach((w, wi) => ctx.fillText(w, midX, pad.top + cH + 18 + wi*14));
+
+    // Rank label
+    const rankT = ['✅ Best','⚠️ Mid','🔴 Priciest'][s.rank];
+    ctx.font      = 'bold 10px -apple-system,sans-serif';
+    ctx.fillStyle = ['#065f46','#92400e','#991b1b'][s.rank];
+    ctx.fillText(rankT, midX, pad.top + cH + 18 + words.length*14 + 2);
+  });
+
+  // ─── Principal line ───
+  const pLineY = pad.top + cH - (P / maxVal) * cH;
+  ctx.setLineDash([6,4]);
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.left, pLineY); ctx.lineTo(pad.left + cW, pLineY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'left'; ctx.font = '10px sans-serif';
+  ctx.fillText('Self-funded baseline (Principal only): ' + inrK(P), pad.left + 4, pLineY - 4);
+
+  // ─── Legend ───
+  const leg = [
+    { color: '#64748b', alpha: 0.8, label: 'Gross Cost (Principal + Total Interest)' },
+    { color: '#cbd5e1', alpha: 1,   label: 'Net Cost (after 80E tax savings)'        },
+    { color: '#94a3b8', alpha: 1,   label: 'Self-funded baseline'                    }
+  ];
+  let lx = pad.left;
+  ctx.font = '11px -apple-system,sans-serif'; ctx.textAlign = 'left';
+  leg.forEach(({ color, alpha, label }) => {
+    ctx.fillStyle = color; ctx.globalAlpha = alpha;
+    ctx.fillRect(lx, 14, 13, 12);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#475569';
+    ctx.fillText(label, lx + 17, 24);
+    lx += ctx.measureText(label).width + 36;
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER TAX REGIME ANALYSIS
+═══════════════════════════════════════════════ */
+function renderRegime() {
+  const div = document.getElementById('regimeContent');
+  const { gross, regime, oldTax: oldTaxAnnual, newTax: newTaxAnnual } = _calcState;
+  if (!gross) {
+    div.innerHTML = '<p style="color:var(--muted);font-size:.875rem">Enter your income to see regime analysis.</p>';
+    return;
+  }
+
+  const tab     = _currentTab;
+  const tabName = _TAB_NAMES[tab] || tab;
+  const schedData = _schedules[tab]  || {};
+  const e80       = _80eData[tab]    || { total: 0, yearwise: [] };
+
+  const oldNetCost = schedData.totalInt - e80.total;
+  const newNetCost = schedData.totalInt; // no 80E under new
+  const oldBetter  = oldNetCost < newNetCost && e80.total > 0;
+
+  const regimeHTML = `
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:.85rem">
+      Analysis based on <strong>${tabName}</strong> scenario.
+      Section 80E deduction (full interest, up to 8 years) is only available under Old Regime.
+    </p>
+    <div class="regime-grid">
+      <div class="regime-card ${oldBetter?'rec':''}">
+        <h4>🏛 Old Regime</h4>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">With Section 80E deduction</div>
+        <div class="amount">${inrK(oldTaxAnnual)} / yr</div>
+        <div class="note">80E Savings (total): <strong style="color:#065f46">${inrK(e80.total)}</strong></div>
+        <div class="note" style="font-weight:700;color:var(--primary);margin-top:.4rem">Net Loan Cost: ${inrK(oldNetCost)}</div>
+        ${oldBetter ? '<div style="margin-top:.5rem"><span class="pill best">Recommended for you</span></div>' : ''}
+      </div>
+      <div class="regime-card ${!oldBetter?'rec':''}">
+        <h4>📋 New Regime</h4>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">No Section 80E deduction</div>
+        <div class="amount">${inrK(newTaxAnnual)} / yr</div>
+        <div class="note">80E Savings (total): <strong>₹0</strong></div>
+        <div class="note" style="font-weight:700;color:var(--primary);margin-top:.4rem">Net Loan Cost: ${inrK(newNetCost)}</div>
+        ${!oldBetter ? '<div style="margin-top:.5rem"><span class="pill new">Recommended for you</span></div>' : ''}
+      </div>
+    </div>
+    <div class="info-note">
+      <strong>📌 Section 80E Key Facts:</strong>
+      Full interest paid on education loan is deductible — no upper cap.
+      Available for up to <strong>8 years</strong> from the year repayment starts.
+      Not available under the New Tax Regime.
+      ${e80.total > 0
+        ? `At your income, Old Regime saves <strong>${inrK(e80.total)}</strong> in taxes over the loan period through 80E.`
+        : 'Your taxable income may be below the threshold; 80E has no impact at present income.'}
+    </div>
+  `;
+
+  const tableHTML = e80.yearwise.length > 0 ? `
+    <div style="overflow-x:auto;margin-top:1rem">
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Interest Paid</th>
+            <th>80E Deduction</th>
+            <th>Tax Saving</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${e80.yearwise.map(y => `<tr>
+            <td>${y.label}</td>
+            <td>${inr(y.interest)}</td>
+            <td>${inr(y.interest)}</td>
+            <td class="saving-td">${inr(y.saving)}</td>
+          </tr>`).join('')}
+          <tr class="total">
+            <td>Total</td>
+            <td>${inr(e80.yearwise.reduce((s,y)=>s+y.interest,0))}</td>
+            <td>${inr(e80.yearwise.reduce((s,y)=>s+y.interest,0))}</td>
+            <td class="saving-td">${inr(e80.total)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>` : '';
+
+  div.innerHTML = regimeHTML + tableHTML;
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER AMORTIZATION TABLE
+═══════════════════════════════════════════════ */
+function switchTab(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  _currentTab = type;
+  renderAmort(type);
+  renderRegime();
+}
+
+function renderAmort(type) {
+  const base = _schedules[type];
+  if (!base) return;
+
+  // Apply any prepayments to get possibly-modified schedule
+  const prepays = _prepayments[type] || {};
+  const hasPrepay = Object.keys(prepays).some(k => (prepays[k]||0) > 0);
+  const data = hasPrepay ? buildSchedWithPrepay(type, prepays) : base;
+
+  const isDef = type === 'deferred';
+  // Track EMI changes: find the first repayment EMI
+  let lastEMI = null;
+
+  let html = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:.6rem">
+    💡 Prepay in any row — during moratorium it reduces principal directly; EMI recalculates automatically for remaining months.
+  </div>`;
+
+  html += `<div class="tbl-scroll"><table class="amort">
+    <thead><tr>
+      <th>Month</th><th style="text-align:left">Phase</th>
+      <th>Payment</th><th>Principal</th><th>Prepay</th><th>Interest</th>
+      ${isDef ? '<th>Accrued</th>' : ''}
+      <th>EMI</th><th>Balance</th>
+    </tr></thead>
+    <tbody>`;
+
+  const startYear  = parseInt(document.getElementById('loanStartYear').value)  || 2026;
+  const startMonth = parseInt(document.getElementById('loanStartMonth').value) || 1;
+
+  for (const row of data.sched) {
+    const isMor = row.phase === 'mor';
+    const hasPrepayRow = (row.prepay || 0) > 0;
+    const emiChanged = !isMor && lastEMI !== null && Math.round(row.payment - row.prin + row.interest) !== Math.round(lastEMI) || false;
+    if (!isMor) {
+      // EMI for this row = payment - prepay (just the scheduled EMI portion)
+      lastEMI = row.payment - (row.prepay || 0);
+    }
+    const rowEMI = isMor ? null : (row.payment - (row.prepay || 0));
+
+    html += `<tr class="${isMor ? 'mphase' : ''}${hasPrepayRow ? ' prepaid' : ''}">
+      <td title="Month ${row.month}">${schedMonthLabel(startYear, startMonth, row.month - 1)}</td>
+      <td style="text-align:left"><span class="ph-tag ${isMor?'m':'r'}">${isMor?'Moratorium':'Repayment'}</span></td>
+      <td>${row.payment > 0 ? inr(row.payment) : '<span style="color:#94a3b8">—</span>'}</td>
+      <td>${row.prin > 0 ? inr(row.prin - (row.prepay||0)) : '<span style="color:#94a3b8">—</span>'}</td>
+      <td class="prepay-val">
+        <input class="prepay-input" type="number" min="0" step="1000"
+          value="${(row.prepay||0) > 0 ? row.prepay : ''}"
+          placeholder="0"
+          onchange="handlePrepay('${type}',${row.month},this.value)"
+          onkeydown="if(event.key==='Enter')this.blur()"
+        />
+      </td>
+      <td>${row.interest > 0 ? inr(row.interest) : '<span style="color:#94a3b8">—</span>'}</td>
+      ${isDef ? `<td style="color:#f59e0b">${isMor ? inr(row.accrued) : '—'}</td>` : ''}
+      <td class="${hasPrepayRow ? 'emi-changed' : ''}">${isMor ? '<span style="color:#94a3b8">—</span>' : inr(rowEMI)}</td>
+      <td>${inr(row.bal)}</td>
+    </tr>`;
+  }
+
+  html += '</tbody></table></div>';
+
+  // Footer: base stats + savings banner
+  const totalPaid = data.sched.reduce((s,r) => s + r.payment, 0);
+  const origTotalPaid = base.sched.reduce((s,r) => s + r.payment, 0);
+  const origMonths = base.sched.length;
+  const newMonths  = data.sched.length;
+
+  html += `<div class="tbl-footer">
+    <span>Months: <strong>${newMonths}</strong></span>
+    <span>Total Paid: <strong>${inr(totalPaid)}</strong></span>
+    <span>Total Interest: <strong>${inr(data.totalInt)}</strong></span>
+    ${data.capInterest ? `<span>Capitalised: <strong style="color:var(--red)">${inr(data.capInterest)}</strong></span>` : ''}
+    ${hasPrepay ? `<button class="reset-prepay" onclick="resetPrepay('${type}')">✕ Reset Prepayments</button>` : ''}
+    <button class="export-btn" onclick="exportAmort('${type}')">⬇ Export CSV</button>
+  </div>`;
+
+  if (hasPrepay) {
+    const intSaved   = base.totalInt - data.totalInt;
+    const monthsSaved = origMonths - newMonths;
+    const totalPrepaid = Object.values(prepays).reduce((s,v) => s+(v||0), 0);
+    html += `<div class="savings-banner">
+      <div class="sav-item"><div class="sav-val">${inrK(totalPrepaid)}</div><div class="sav-lbl">Total Prepaid</div></div>
+      <div class="sav-item"><div class="sav-val" style="color:#065f46">−${inrK(intSaved)}</div><div class="sav-lbl">Interest Saved</div></div>
+      <div class="sav-item"><div class="sav-val">${inrK(origTotalPaid)} → ${inrK(totalPaid)}</div><div class="sav-lbl">Total Payment</div></div>
+      ${monthsSaved > 0 ? `<div class="sav-item"><div class="sav-val">−${monthsSaved} mo</div><div class="sav-lbl">Loan Shorter</div></div>` : ''}
+    </div>`;
+  }
+
+  document.getElementById('amortContainer').innerHTML = html;
+}
+
+function exportAmort(type) {
+  const base     = _schedules[type];
+  if (!base) return;
+  const prepays  = _prepayments[type] || {};
+  const hasPre   = Object.keys(prepays).some(k => (prepays[k] || 0) > 0);
+  const data     = hasPre ? buildSchedWithPrepay(type, prepays) : base;
+  const { r, morM, repM, P } = _loanParams;
+  const annRate  = (r * 12 * 100).toFixed(2);
+  const isDef    = type === 'deferred';
+  const names    = { immediate: 'Immediate EMI', psi: 'PSI + EMI', deferred: 'Full Deferral' };
+
+  const fmt = v => Math.round(v); // plain numbers for CSV, Excel can format
+
+  const startYear  = parseInt(document.getElementById('loanStartYear').value)  || 2026;
+  const startMonth = parseInt(document.getElementById('loanStartMonth').value) || 1;
+
+  // ── Metadata header ──
+  const meta = [
+    ['Education Loan Amortization Schedule'],
+    ['Scenario', names[type]],
+    ['Loan Start Date', schedMonthLabel(startYear, startMonth, 0)],
+    ['Principal (₹)', fmt(P)],
+    ['Annual Interest Rate (%)', annRate],
+    ['Moratorium (months)', morM],
+    ['Repayment Tenure (months)', repM],
+    ['Total Interest (₹)', fmt(data.totalInt)],
+    ['Total Paid (₹)', fmt(data.sched.reduce((s, row) => s + row.payment, 0))],
+    []
+  ];
+
+  // ── Column headers ──
+  const cols = ['Month #', 'Date', 'Phase', 'Payment (₹)', 'Principal (₹)', 'Prepay (₹)', 'Interest (₹)'];
+  if (isDef) cols.push('Accrued Interest (₹)');
+  cols.push('EMI (₹)', 'Balance (₹)');
+
+  // ── Data rows ──
+  const rows = data.sched.map(row => {
+    const isMor = row.phase === 'mor';
+    const emi   = isMor ? '' : fmt(row.payment - (row.prepay || 0));
+    const r2    = [
+      row.month,
+      schedMonthLabel(startYear, startMonth, row.month - 1),
+      isMor ? 'Moratorium' : 'Repayment',
+      fmt(row.payment),
+      isMor ? '' : fmt(row.prin - (row.prepay || 0)),
+      (row.prepay || 0) > 0 ? fmt(row.prepay) : '',
+      row.interest > 0 ? fmt(row.interest) : '',
+    ];
+    if (isDef) r2.push(isMor ? fmt(row.accrued || 0) : '');
+    r2.push(emi, fmt(row.bal));
+    return r2;
+  });
+
+  const toCSV = arr => arr.map(v => {
+    const s = String(v ?? '');
+    return s.includes(',') || s.includes('"') ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(',');
+
+  const csv = [
+    ...meta.map(toCSV),
+    toCSV(cols),
+    ...rows.map(toCSV)
+  ].join('\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `loan-amort-${type}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════════════
+   PREPAYMENT ENGINE
+═══════════════════════════════════════════════ */
+function buildSchedWithPrepay(type, prepays) {
+  const base                        = _schedules[type];
+  const { r, morM, repM, P, numDisb } = _loanParams;
+
+  const sched = [];
+  let morInterest = 0, capInterest = 0;
+
+  // ── Rebuild moratorium phase with prepayments ──
+  if (type === 'immediate') {
+    // EMI recalculated at each annual disbursement, and again after any prepayment
+    const totalM   = morM + repM;
+    const tranche  = P / numDisb;
+    let bal        = 0, currentEMI = 0;
+    for (let i = 1; i <= totalM; i++) {
+      if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) {
+        bal += tranche;
+        currentEMI = calcEMI(bal, r, totalM - i + 1);
+      }
+      const rawPrepay    = prepays[i] || 0;
+      const remaining    = totalM - i;
+      const interest     = bal * r;
+      const schedPrin    = Math.max(0, Math.min(currentEMI - interest, bal));
+      const actualPrepay = Math.min(Math.max(0, rawPrepay), Math.max(0, bal - schedPrin));
+      const totalPrin    = schedPrin + actualPrepay;
+      const payment      = interest + totalPrin;
+      bal = Math.max(0, bal - totalPrin);
+      sched.push({ month: i, payment, prin: totalPrin, interest, bal, phase: i <= morM ? 'mor' : 'rep', prepay: actualPrepay });
+      if (bal < 0.5) break;
+      if (actualPrepay > 0 && remaining > 0) currentEMI = calcEMI(bal, r, remaining);
+    }
+    return { ...base, sched, emiAfter: currentEMI, totalInt: sched.reduce((s, row) => s + row.interest, 0) };
+  }
+
+  if (type === 'psi') {
+    // Moratorium: pay interest-only on disbursed balance; prepayments reduce principal
+    let bal = 0;
+    for (let i = 1; i <= morM; i++) {
+      if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) bal += P / numDisb;
+      const rawPrepay    = prepays[i] || 0;
+      const interest     = bal * r;
+      const actualPrepay = Math.min(Math.max(0, rawPrepay), bal);
+      const payment      = interest + actualPrepay;
+      bal = Math.max(0, bal - actualPrepay);
+      morInterest += interest;
+      sched.push({ month: i, payment, prin: actualPrepay, interest, bal, phase: 'mor', prepay: actualPrepay });
+      if (bal < 0.5) break;
+    }
+    // bal after moratorium = P - total prepaid during moratorium
+    var psiBalAfterMor = morM > 0 ? sched[sched.length - 1].bal : 0;
+  } else { // deferred    // Moratorium: interest on disbursed balance capitalizes; prepayments reduce growing balance
+    let bal = 0;
+    for (let i = 1; i <= morM; i++) {
+      if (i % 12 === 1 && Math.ceil(i / 12) <= numDisb) bal += P / numDisb;
+      const rawPrepay    = prepays[i] || 0;
+      const interest     = bal * r;
+      bal += interest;
+      const actualPrepay = Math.min(Math.max(0, rawPrepay), bal);
+      bal = Math.max(0, bal - actualPrepay);
+      capInterest += interest;
+      sched.push({ month: i, payment: actualPrepay, prin: actualPrepay, interest: 0, bal, phase: 'mor', prepay: actualPrepay, accrued: capInterest });
+      if (bal < 0.5) break;
+    }
+  }
+
+  // ── Rebuild repayment phase ──
+  // Get balance at end of moratorium from the last moratorium row
+  const balAfterMor = sched.length > 0 ? sched[sched.length - 1].bal : P;
+  let currentEMI = calcEMI(balAfterMor, r, repM);
+  let repInterest = 0;
+  let repBal = balAfterMor;
+
+  for (let k = 1; k <= repM; k++) {
+    const monthNum        = morM + k;
+    const rawPrepay       = prepays[monthNum] || 0;
+    const remainingAfter  = repM - k;
+    const interest        = repBal * r;
+    const schedPrin       = Math.max(0, Math.min(currentEMI - interest, repBal));
+    const actualPrepay    = Math.min(Math.max(0, rawPrepay), Math.max(0, repBal - schedPrin));
+    const totalPrin       = schedPrin + actualPrepay;
+    const payment         = interest + totalPrin;
+    repBal = Math.max(0, repBal - totalPrin);
+    repInterest += interest;
+    sched.push({ month: monthNum, payment, prin: totalPrin, interest, bal: repBal, phase: 'rep', prepay: actualPrepay });
+    if (repBal < 0.5) break;
+    if (actualPrepay > 0 && remainingAfter > 0) currentEMI = calcEMI(repBal, r, remainingAfter);
+  }
+
+  return { ...base, sched, emiAfter: currentEMI, totalInt: capInterest + morInterest + repInterest, capInterest };
+}
+
+function handlePrepay(type, month, rawVal) {
+  const val = Math.max(0, parseFloat(rawVal) || 0);
+  // Apply to all scenarios so switching tabs shows the same prepayments
+  ['immediate', 'psi', 'deferred'].forEach(t => {
+    _prepayments[t] = _prepayments[t] || {};
+    if (val === 0) {
+      delete _prepayments[t][month];
+    } else {
+      _prepayments[t][month] = val;
+    }
+  });
+  renderAmort(type); // re-render the currently visible tab
+  refreshScenariosAndChart();
+}
+
+function resetPrepay(type) {
+  _prepayments = { immediate: {}, psi: {}, deferred: {} };
+  renderAmort(type);
+  refreshScenariosAndChart();
+}
+
+/* Recompute scenario cards + chart using current prepayment state */
+function refreshScenariosAndChart() {
+  if (!_calcState.gross) return;
+  const { P, morM, repM } = _loanParams;
+  const { gross, regime, invReturn, loanStartYear, loanStartMonth } = _calcState;
+  const repayYrs   = repM / 12;
+  const totalM     = morM + repM;
+  const invGains   = calcInvGains(P, invReturn, totalM);
+
+  const totalPrepaid = Object.values(_prepayments['immediate'] || {}).reduce((s,v) => s+(v||0), 0);
+
+  function effSched(t) {
+    const prepays = _prepayments[t] || {};
+    const has = Object.keys(prepays).some(k => (prepays[k] || 0) > 0);
+    return has ? buildSchedWithPrepay(t, prepays) : _schedules[t];
+  }
+
+  const immEff = effSched('immediate');
+  const psiEff = effSched('psi');
+  const defEff = effSched('deferred');
+
+  const imm80E = calc80E(immEff.sched, gross, regime, loanStartYear, loanStartMonth);
+  const psi80E = calc80E(psiEff.sched, gross, regime, loanStartYear, loanStartMonth);
+  const def80E = calc80E(defEff.sched, gross, regime, loanStartYear, loanStartMonth);
+  _80eData = { immediate: imm80E, psi: psi80E, deferred: def80E };
+
+  const scenarios = [
+    {
+      key: 'immediate', name: 'Immediate EMI',
+      sub: `EMI from month 2, no moratorium (${Math.round(morM/12) + repayYrs} yr term)`,
+      ...immEff,
+      baseTotalInt: _schedules.immediate.totalInt, baseEmiAfter: _schedules.immediate.emiAfter, totalPrepaid,
+      savings: imm80E.total, netInt: immEff.totalInt - imm80E.total,
+      invGains, invReturn
+    },
+    {
+      key: 'psi', name: 'PSI + EMI',
+      sub: `Interest only during moratorium (${Math.round(morM/12)} yrs), then EMI`,
+      ...psiEff,
+      baseTotalInt: _schedules.psi.totalInt, baseEmiAfter: _schedules.psi.emiAfter, totalPrepaid,
+      savings: psi80E.total, netInt: psiEff.totalInt - psi80E.total,
+      invGains, invReturn
+    },
+    {
+      key: 'deferred', name: 'Full Deferral',
+      sub: `No payment during moratorium, EMI on capitalized principal`,
+      ...defEff,
+      baseTotalInt: _schedules.deferred.totalInt, baseEmiAfter: _schedules.deferred.emiAfter, totalPrepaid,
+      savings: def80E.total, netInt: defEff.totalInt - def80E.total,
+      invGains, invReturn
+    }
+  ];
+
+  const sorted = [...scenarios].sort((a, b) => a.netInt - b.netInt);
+  scenarios.forEach(s => { s.rank = sorted.findIndex(x => x.key === s.key); });
+
+  renderCards(scenarios, P, morM, repM, regime);
+  renderRegime();
+  requestAnimationFrame(() => renderChart(scenarios, P));
+}
+</script>
+</body>
+</html>
