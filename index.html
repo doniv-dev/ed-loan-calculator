@@ -22,6 +22,50 @@
       --radius: 14px;
       --shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
     }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --border: #334155;
+      --primary: #60a5fa;
+      --primary-light: #1e3a5f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #34d399;
+      --green-bg: #064e3b;
+      --amber: #fbbf24;
+      --amber-bg: #451a03;
+      --red: #f87171;
+      --red-bg: #450a0a;
+      --shadow: 0 1px 4px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+      color-scheme: dark;
+    }
+    /* dark-mode overrides for hardcoded colours */
+    [data-theme="dark"] .card            { background: var(--surface); }
+    [data-theme="dark"] input,
+    [data-theme="dark"] select            { background: #0f172a; color: var(--text); border-color: var(--border); }
+    [data-theme="dark"] .prepay-input     { background: #0f172a; }
+    [data-theme="dark"] .prepay-input:disabled { background: #1e293b; color: var(--muted); }
+    [data-theme="dark"] .amort tr:nth-child(even) { background: #1a2742; }
+    [data-theme="dark"] .amort tr.mphase td      { background: #2a1f00; }
+    [data-theme="dark"] .amort tr.prepaid td     { background: #1e1a36 !important; }
+    [data-theme="dark"] .amort thead th          { background: #1d4ed8; }
+    [data-theme="dark"] .net-box                 { background: #0f172a; }
+    [data-theme="dark"] .calc-box                { border-color: var(--border); }
+    [data-theme="dark"] .calc-box-title          { background: #1e293b; color: var(--muted); }
+    [data-theme="dark"] .calc-row.sep            { background: #162032; }
+    [data-theme="dark"] .calc-row.total          { background: #064e3b; border-color: #065f46; }
+    [data-theme="dark"] .calc-row.total .c-lbl,
+    [data-theme="dark"] .calc-row.total .c-val   { color: #34d399; }
+    [data-theme="dark"] .inv-chip                { background: #1e3a5f; border-color: #1d4ed8; }
+    [data-theme="dark"] .inv-chip-val            { color: #93c5fd; }
+    [data-theme="dark"] .row-80e                 { background: #064e3b; border-color: #065f46; }
+    [data-theme="dark"] .row-80e.na              { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .savings-banner          { background: linear-gradient(135deg,#064e3b,#065f46); border-color: #065f46; }
+    [data-theme="dark"] .sav-val                 { color: #34d399; }
+    [data-theme="dark"] .regime-card             { background: #1e293b; }
+    [data-theme="dark"] .reset-prepay,
+    [data-theme="dark"] .export-btn              { background: #1e293b; color: var(--muted); border-color: var(--border); }
+    [data-theme="dark"] .tbl-scroll              { border-color: var(--border); }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -250,6 +294,86 @@
     .row:last-of-type { border-bottom: none; }
     .row .lbl { color: var(--muted); }
     .row .val { font-weight: 600; }
+    /* ── 80E HIGHLIGHT ── */
+    .row-80e {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .5rem .65rem;
+      margin: .35rem 0;
+      border-radius: 8px;
+      font-size: .85rem;
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+    }
+    .row-80e.na {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+    }
+    .row-80e .lbl { color: #065f46; font-weight: 600; }
+    .row-80e .val { font-weight: 800; color: #065f46; font-size: .95rem; }
+    /* ── EFFECTIVE COST SUMMARY ROWS ── */
+    .row-eff {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .5rem .65rem;
+      margin: .3rem 0;
+      border-radius: 8px;
+      font-size: .85rem;
+    }
+    .row-eff.after80e {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .row-eff.after80e .lbl { color: #1d4ed8; font-weight: 600; }
+    .row-eff.after80e .val { font-weight: 800; color: #1d4ed8; font-size: .95rem; }
+    .row-eff.afterinv {
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+    }
+    .row-eff.afterinv .lbl { color: #065f46; font-weight: 600; }
+    .row-eff.afterinv .val { font-weight: 800; color: #065f46; font-size: 1rem; }
+    /* ── COST BREAKDOWN CALC BOX ── */
+    .calc-box {
+      margin-top: .6rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: .82rem;
+    }
+    .calc-box-title {
+      background: #f1f5f9;
+      padding: .4rem .75rem;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      color: #475569;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .38rem .75rem;
+      border-bottom: 1px dashed #f1f5f9;
+    }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row .c-lbl { color: #64748b; }
+    .calc-row .c-val { font-weight: 700; font-family: monospace; font-size: .88rem; }
+    .calc-row.add   .c-val { color: #1e293b; }
+    .calc-row.sub   .c-val { color: #065f46; }
+    .calc-row.sep   { background: #f8fafc; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; padding: .3rem .75rem; }
+    .calc-row.sep   .c-lbl { color: #334155; font-weight: 700; }
+    .calc-row.sep   .c-val { color: #1e293b; font-weight: 800; }
+    .calc-row.total {
+      background: #d1fae5;
+      border-top: 2px solid #6ee7b7;
+      padding: .5rem .75rem;
+    }
+    .calc-row.total .c-lbl { color: #065f46; font-weight: 800; font-size: .88rem; }
+    .calc-row.total .c-val { color: #065f46; font-weight: 900; font-size: 1rem; font-family: monospace; }
     .net-box {
       margin-top: .9rem;
       padding: .875rem;
@@ -407,6 +531,27 @@
     }
     .export-btn:hover { background: #2563eb; color: #fff; }
 
+    /* ── INVESTMENT HIGHLIGHTS ── */
+    .inv-highlights {
+      display: flex;
+      gap: .5rem;
+      margin: .6rem 0 .1rem;
+      flex-wrap: wrap;
+    }
+    .inv-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 70px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: .35rem .5rem;
+    }
+    .inv-chip-val  { font-size: .85rem; font-weight: 800; color: #1d4ed8; }
+    .inv-chip-lbl  { font-size: .62rem; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-top: .1rem; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 620px) {
       .form-grid   { grid-template-columns: 1fr 1fr; }
@@ -417,9 +562,16 @@
 </head>
 <body>
 
-<header>
+<header style="position:relative">
   <h1>🎓 Education Loan Comparator</h1>
   <p>Compare repayment strategies · Section 80E Tax Savings · Indian Income Tax Slabs (FY 2025-26)</p>
+  <p style="margin-top:.75rem;font-size:.75rem;opacity:.75;background:rgba(255,255,255,.12);display:inline-block;padding:.3rem .75rem;border-radius:20px;">
+    ⚠️ For informational purposes only — consult a qualified tax professional or financial advisor for actual calculations.
+  </p>
+  <button id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode"
+    style="position:absolute;top:1.25rem;right:1.25rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:50%;width:36px;height:36px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;">
+    🌙
+  </button>
 </header>
 
 <div class="wrap">
@@ -1094,12 +1246,17 @@ function renderCards(scenarios, P, morM, repM, regime) {
   const cls   = ['best','mid','worst'];
   const label = ['✅ Cheapest','⚠️ Middle','🔴 Most Expensive'];
 
+  // Determine which optional rows ANY scenario has — so ALL cards show the same rows
+  const anyCapInt = scenarios.some(s => s.capInterest > 0);
+  const anyPrepay = scenarios.some(s => s.totalPrepaid > 0);
+
   let html = '';
   for (const s of scenarios) {
-    const c              = cls[s.rank];
-    const totalPaid      = P + s.totalInt;
-    const emiChanged     = s.totalPrepaid > 0 && Math.round(s.emiAfter) !== Math.round(s.baseEmiAfter);
-    const totalChanged   = s.totalPrepaid > 0;
+    const c         = cls[s.rank];
+    const totalPaid = P + s.totalInt;
+    const emiChanged  = s.totalPrepaid > 0 && Math.round(s.emiAfter) !== Math.round(s.baseEmiAfter);
+    const termYrs   = ((morM + repM) / 12).toFixed(1);
+
     html += `
     <div class="sc-card ${c}">
       <div class="sc-head">
@@ -1126,36 +1283,68 @@ function renderCards(scenarios, P, morM, repM, regime) {
       </div>
       <div class="row">
         <span class="lbl">Total Interest (gross)</span>
-        <span class="val">${totalChanged
+        <span class="val">${s.totalPrepaid > 0
           ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.82em">${inr(s.baseTotalInt)}</span> <strong>${inr(s.totalInt)}</strong>`
           : inr(s.totalInt)}</span>
       </div>
-      ${s.capInterest ? `<div class="row">
+      ${anyCapInt ? `<div class="row">
         <span class="lbl">of which: capitalized interest</span>
-        <span class="val" style="color:var(--red)">${inr(s.capInterest)}</span>
+        <span class="val" style="color:${s.capInterest > 0 ? 'var(--red)' : 'var(--muted)'}">${s.capInterest > 0 ? inr(s.capInterest) : '—'}</span>
       </div>` : ''}
-      ${regime==='old' ? `<div class="row">
-        <span class="lbl">Section 80E tax savings</span>
-        <span class="val" style="color:var(--green)">−${inr(s.savings)}</span>
-      </div>` : ''}
-      ${totalChanged ? `
+      ${anyPrepay ? `
       <div class="row">
         <span class="lbl" style="color:#6d28d9">Total Prepaid (principal)</span>
-        <span class="val" style="color:#6d28d9">${inr(s.totalPrepaid)}</span>
+        <span class="val" style="color:${s.totalPrepaid > 0 ? '#6d28d9' : 'var(--muted)'}">${s.totalPrepaid > 0 ? inr(s.totalPrepaid) : '—'}</span>
       </div>
       <div class="row">
         <span class="lbl" style="color:var(--green)">Interest Saved (vs no prepay)</span>
-        <span class="val" style="color:var(--green)">−${inr(s.baseTotalInt - s.totalInt)}</span>
+        <span class="val" style="color:${s.totalPrepaid > 0 ? 'var(--green)' : 'var(--muted)'}">${s.totalPrepaid > 0 ? '−'+inr(s.baseTotalInt - s.totalInt) : '—'}</span>
       </div>` : ''}
       <div class="row">
         <span class="lbl">Total amount paid</span>
-        <span class="val">${totalChanged
+        <span class="val">${s.totalPrepaid > 0
           ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.82em">${inr(P + s.baseTotalInt)}</span> <strong>${inr(totalPaid)}</strong>`
           : inr(totalPaid)}</span>
       </div>
 
+      <!-- Cost breakdown calculation -->
+      <div class="calc-box">
+        <div class="calc-box-title">🧮 True Net Cost Breakdown</div>
+        <div class="calc-row add">
+          <span class="c-lbl">+ Principal</span>
+          <span class="c-val">${inr(P)}</span>
+        </div>
+        <div class="calc-row add">
+          <span class="c-lbl">+ Total Interest (gross)</span>
+          <span class="c-val">${inr(s.totalInt)}</span>
+        </div>
+        <div class="calc-row sep">
+          <span class="c-lbl">= Total Amount Paid</span>
+          <span class="c-val">${inr(totalPaid)}</span>
+        </div>
+        ${regime==='old' && s.savings > 0
+          ? `<div class="calc-row sub">
+              <span class="c-lbl">− Section 80E Tax Saved</span>
+              <span class="c-val" style="color:#065f46">−${inr(s.savings)}</span>
+            </div>`
+          : `<div class="calc-row" style="background:#f8fafc">
+              <span class="c-lbl" style="color:var(--muted)">− Section 80E Tax Saved</span>
+              <span class="c-val" style="color:var(--muted);font-size:.78rem">N/A (New Regime)</span>
+            </div>`}
+        ${s.invGains > 0
+          ? `<div class="calc-row sub">
+              <span class="c-lbl">− Investment Returns (${s.invReturn}% × ${termYrs} yrs)</span>
+              <span class="c-val" style="color:#065f46">−${inr(s.invGains)}</span>
+            </div>`
+          : ''}
+        <div class="calc-row total">
+          <span class="c-lbl">=  True Net Cost</span>
+          <span class="c-val">${inr(Math.max(0, P + s.netInt - (s.invGains || 0)))}</span>
+        </div>
+      </div>
+
       <div class="net-box">
-        <div class="net-label">Net interest cost${regime==='old'?' (after 80E tax benefit)':''}</div>
+        <div class="net-label">Net interest cost${regime==='old' ? ' (after 80E tax benefit)' : ' (80E not applicable — New Regime)'}</div>
         <div class="net-value ${c}">${inr(s.netInt)}</div>
         <div class="bar-track">
           <div class="bar-fill ${c}" style="width:${Math.min(100,(s.totalInt/P)*100).toFixed(1)}%"></div>
@@ -1164,17 +1353,30 @@ function renderCards(scenarios, P, morM, repM, regime) {
       </div>
 
       ${s.invGains > 0 ? (() => {
-        const adv = s.invGains - s.netInt;
-        const loanWins = adv >= 0;
-        const termYrs = ((morM + repM) / 12).toFixed(1);
-        const breakeven = calcBreakevenReturn(s.netInt, s.selfAmt, morM + repM);
+        const adv          = s.invGains - s.netInt;
+        const loanWins     = adv >= 0;
+        const breakeven    = calcBreakevenReturn(s.netInt, s.selfAmt, morM + repM);
         const breakevenFmt = breakeven.toFixed(2) + '% p.a.';
         const breakevenColor = s.invReturn >= breakeven ? 'var(--green)' : 'var(--red)';
         return `
-      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)">
-        <div style="font-size:.68rem;font-weight:700;color:#475569;letter-spacing:.05em;margin-bottom:.35rem">📈 VS SELF-FUNDED (invest ${inrK(s.selfAmt)} at ${s.invReturn}% for ${termYrs} yrs)</div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:2px solid #bfdbfe">
+        <div style="font-size:.7rem;font-weight:800;color:#1d4ed8;letter-spacing:.05em;margin-bottom:.45rem">📈 INVESTMENT COMPARISON</div>
+        <div class="inv-highlights">
+          <div class="inv-chip">
+            <span class="inv-chip-val">${inrK(s.selfAmt)}</span>
+            <span class="inv-chip-lbl">Amount</span>
+          </div>
+          <div class="inv-chip">
+            <span class="inv-chip-val">${s.invReturn}%</span>
+            <span class="inv-chip-lbl">Ann. Return</span>
+          </div>
+          <div class="inv-chip">
+            <span class="inv-chip-val">${termYrs} yrs</span>
+            <span class="inv-chip-lbl">Duration</span>
+          </div>
+        </div>
         <div class="row">
-          <span class="lbl">${inrK(s.selfAmt)} investment growth</span>
+          <span class="lbl">Investment growth</span>
           <span class="val" style="color:var(--green)">+${inrK(s.invGains)}</span>
         </div>
         <div class="row">
@@ -1182,7 +1384,7 @@ function renderCards(scenarios, P, morM, repM, regime) {
           <span class="val" style="color:var(--red)">−${inrK(s.netInt)}</span>
         </div>
         <div class="row" style="font-weight:700">
-          <span class="lbl">Net advantage of taking loan</span>
+          <span class="lbl">Net advantage (loan vs self-fund)</span>
           <span class="val" style="color:${loanWins?'var(--green)':'var(--red)'}">
             ${loanWins ? `+${inrK(adv)} 🏆 Loan wins` : `−${inrK(-adv)} Self-fund wins`}
           </span>
@@ -1193,8 +1395,11 @@ function renderCards(scenarios, P, morM, repM, regime) {
         </div>
         <div style="font-size:.7rem;color:var(--muted);margin-top:.2rem">
           ${s.invReturn >= breakeven
-            ? `Your ${s.invReturn}% return beats the ${breakevenFmt} breakeven — loan is advantageous`
+            ? `Your ${s.invReturn}% beats the ${breakevenFmt} breakeven — loan is advantageous`
             : `Need ≥ ${breakevenFmt} on investments for loan to be advantageous`}
+        </div>
+        <div style="font-size:.65rem;color:var(--muted);margin-top:.15rem;font-style:italic">
+          ⚠ Assumes ₹${inrK(s.selfAmt)} invested as a lump sum on day 1 for the full ${Math.round((morM+repM)/12)}-yr term. Staged disbursements would raise the breakeven slightly.
         </div>
       </div>`;
       })() : ''}
@@ -1764,6 +1969,26 @@ function refreshScenariosAndChart() {
   renderRegime();
   requestAnimationFrame(() => renderChart(scenarios, P));
 }
+/* ═══════════════════════════════════════════════
+   DARK MODE
+═══════════════════════════════════════════════ */
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = dark ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = !isDark;
+  localStorage.setItem('theme', next ? 'dark' : 'light');
+  applyTheme(next);
+}
+// Apply saved preference on load
+(function() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved ? saved === 'dark' : prefersDark);
+})();
 </script>
 </body>
 </html>
