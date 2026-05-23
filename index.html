@@ -433,30 +433,30 @@
         <label>Annual Gross Income</label>
         <div class="input-wrap has-pre has-unit">
           <span class="pre">₹</span>
-          <input type="number" id="incomeVal" value="1.5" min="0" step="0.01"
+          <input type="number" id="incomeVal" value="15" min="0" step="0.01"
             oninput="onAmtChange('income')" />
           <select id="incomeUnit" class="unit-sel" onchange="onAmtChange('income')">
-            <option value="10000000" selected>Crore</option>
-            <option value="100000">Lac</option>
+            <option value="10000000">Crore</option>
+            <option value="100000" selected>Lac</option>
             <option value="1000">Thousand</option>
           </select>
         </div>
-        <span class="amount-label" id="incomeLabel">₹1,50,00,000</span>
+        <span class="amount-label" id="incomeLabel">₹15,00,000</span>
       </div>
 
       <div class="fg">
         <label>Loan Amount Required</label>
         <div class="input-wrap has-pre has-unit">
           <span class="pre">₹</span>
-          <input type="number" id="loanAmtVal" value="1.5" min="0" step="0.01"
+          <input type="number" id="loanAmtVal" value="15" min="0" step="0.01"
             oninput="onAmtChange('loanAmt')" />
           <select id="loanAmtUnit" class="unit-sel" onchange="onAmtChange('loanAmt')">
-            <option value="10000000" selected>Crore</option>
-            <option value="100000">Lac</option>
+            <option value="10000000">Crore</option>
+            <option value="100000" selected>Lac</option>
             <option value="1000">Thousand</option>
           </select>
         </div>
-        <span class="amount-label" id="loanAmtLabel">₹1,50,00,000</span>
+        <span class="amount-label" id="loanAmtLabel">₹15,00,000</span>
       </div>
 
       <div class="fg">
@@ -529,7 +529,23 @@
         <div class="input-wrap">
           <input id="invReturn" type="number" value="6" min="0" max="30" step="0.5" />
         </div>
-        <span class="hint">Expected return if you invest the loan amount (e.g. 10% equity, 7% FD)</span>
+        <span class="hint">Expected return if you invest the self-fund amount (e.g. 10% equity, 7% FD)</span>
+      </div>
+
+      <div class="fg">
+        <label>Amount Available for Self-Funding</label>
+        <div class="input-wrap has-pre has-unit">
+          <span class="pre">₹</span>
+          <input type="number" id="selfFundAmtVal" min="0" step="0.01"
+            oninput="onAmtChange('selfFundAmt')" />
+          <select id="selfFundAmtUnit" class="unit-sel" onchange="onAmtChange('selfFundAmt')">
+            <option value="10000000">Crore</option>
+            <option value="100000">Lac</option>
+            <option value="1000">Thousand</option>
+          </select>
+        </div>
+        <span class="amount-label" id="selfFundAmtLabel"></span>
+        <span class="hint">How much you could invest instead of taking the loan (default: loan amount)</span>
       </div>
 
     </div><!-- /form-grid -->
@@ -562,6 +578,7 @@
     <div class="card gap">
       <div class="card-title">📈 Cost Comparison Chart</div>
       <canvas id="chart"></canvas>
+      <div id="chartLegend" style="display:flex;flex-wrap:wrap;gap:.5rem .75rem;margin-top:.75rem;font-size:.78rem;color:#475569;"></div>
     </div>
 
     <!-- Tax Regime Analysis -->
@@ -884,11 +901,18 @@ function markFresh() {
   _calcBtn.classList.remove('stale');
   _calcBtn.innerHTML = 'Calculate &amp; Compare Scenarios &rarr;';
 }
-['incomeVal','incomeUnit','loanAmtVal','loanAmtUnit','rate','courseDur','repayTenure','taxRegime','invReturn']
+['incomeVal','incomeUnit','loanAmtVal','loanAmtUnit','rate','courseDur','repayTenure','taxRegime','invReturn','selfFundAmtVal','selfFundAmtUnit']
   .forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', markStale);
   });
+// When user manually edits self-fund amount, mark it as overridden (stop mirroring loan amount)
+['selfFundAmtVal','selfFundAmtUnit'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input',
+    () => { document.getElementById('selfFundAmtVal').dataset.auto = 'false'; }
+  );
+});
 // Loan start date only affects display labels — re-render amort without full recalculate
 ['loanStartMonth','loanStartYear'].forEach(id => {
   const el = document.getElementById(id);
@@ -924,11 +948,21 @@ function onAmtChange(id) {
   const el = document.getElementById(id + 'Label');
   if (el) el.textContent = v > 0 ? '₹' + Math.round(v).toLocaleString('en-IN') : '';
   if (id === 'income') updateTaxBox();
+  // Mirror loan amount to self-fund field if user hasn't manually overridden it
+  if (id === 'loanAmt') {
+    const sfVal  = document.getElementById('selfFundAmtVal');
+    const sfUnit = document.getElementById('selfFundAmtUnit');
+    if (sfVal && sfVal.dataset.auto !== 'false') {
+      sfVal.value  = document.getElementById('loanAmtVal').value;
+      sfUnit.value = document.getElementById('loanAmtUnit').value;
+      onAmtChange('selfFundAmt');
+    }
+  }
 }
 
 // Initialise labels and tax box for default values on page load
 onAmtChange('income');
-onAmtChange('loanAmt');
+onAmtChange('loanAmt'); // also mirrors to selfFundAmt on first run
 updateTaxBox();
 
 /* ═══════════════════════════════════════════════
@@ -948,6 +982,12 @@ function calcInvGains(P, annualPct, totalMonths) {
   const r = annualPct / 100 / 12;
   return P * (Math.pow(1 + r, totalMonths) - 1);
 }
+// Minimum annual return rate at which investment growth = net interest cost
+// Solve: selfAmt * ((1+r/12)^N - 1) = netInt  =>  r = 12*((1+netInt/selfAmt)^(1/N)-1)
+function calcBreakevenReturn(netInt, selfAmt, totalMonths) {
+  if (!selfAmt || selfAmt <= 0 || netInt <= 0) return 0;
+  return 12 * (Math.pow(1 + netInt / selfAmt, 1 / totalMonths) - 1) * 100;
+}
 
 /* ═══════════════════════════════════════════════
    MAIN CALCULATE
@@ -961,6 +1001,7 @@ function calculate() {
   const repayYrs   = parseInt(document.getElementById('repayTenure').value)    || 10;
   const regimePref = document.getElementById('taxRegime').value;
   const invReturn  = parseFloat(document.getElementById('invReturn').value)    || 6;
+  const selfAmt     = getFieldValue('selfFundAmt') || P;
 
   if (P <= 0)    { alert('Please enter a valid loan amount.'); return; }
   if (repayYrs < 1) { alert('Repayment tenure must be at least 1 year.'); return; }
@@ -980,7 +1021,7 @@ function calculate() {
   const loanStartMonth = parseInt(document.getElementById('loanStartMonth').value) || (new Date().getMonth() + 1);
 
   // Store for prepayment refresh
-  _calcState = { gross, regime, oldTax, newTax, invReturn, loanStartYear, loanStartMonth };
+  _calcState = { gross, regime, oldTax, newTax, invReturn, loanStartYear, loanStartMonth, selfAmt };
 
   // Number of annual disbursements = course duration in years
   const numDisb = Math.max(1, Math.round(courseDur));
@@ -1006,21 +1047,21 @@ function calculate() {
       sub: `EMI from month 2, no moratorium (${Math.round(morM/12)+repayYrs} yr term)`,
       ...immData, baseTotalInt: immData.totalInt, baseEmiAfter: immData.emiAfter, totalPrepaid: 0,
       savings: imm80E.total, netInt: immData.totalInt - imm80E.total,
-      invGains: calcInvGains(P, invReturn, totalM), invReturn
+      invGains: calcInvGains(selfAmt, invReturn, totalM), invReturn, selfAmt
     },
     {
       key: 'psi', name: 'PSI + EMI',
       sub: `Interest only during moratorium (${Math.round(morM/12)} yrs), then EMI`,
       ...psiData, baseTotalInt: psiData.totalInt, baseEmiAfter: psiData.emiAfter, totalPrepaid: 0,
       savings: psi80E.total, netInt: psiData.totalInt - psi80E.total,
-      invGains: calcInvGains(P, invReturn, totalM), invReturn
+      invGains: calcInvGains(selfAmt, invReturn, totalM), invReturn, selfAmt
     },
     {
       key: 'deferred', name: 'Full Deferral',
       sub: `No payment during moratorium, EMI on capitalized principal`,
       ...defData, baseTotalInt: defData.totalInt, baseEmiAfter: defData.emiAfter, totalPrepaid: 0,
       savings: def80E.total, netInt: defData.totalInt - def80E.total,
-      invGains: calcInvGains(P, invReturn, totalM), invReturn
+      invGains: calcInvGains(selfAmt, invReturn, totalM), invReturn, selfAmt
     }
   ];
 
@@ -1126,11 +1167,14 @@ function renderCards(scenarios, P, morM, repM, regime) {
         const adv = s.invGains - s.netInt;
         const loanWins = adv >= 0;
         const termYrs = ((morM + repM) / 12).toFixed(1);
+        const breakeven = calcBreakevenReturn(s.netInt, s.selfAmt, morM + repM);
+        const breakevenFmt = breakeven.toFixed(2) + '% p.a.';
+        const breakevenColor = s.invReturn >= breakeven ? 'var(--green)' : 'var(--red)';
         return `
       <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)">
-        <div style="font-size:.68rem;font-weight:700;color:#475569;letter-spacing:.05em;margin-bottom:.35rem">📈 VS SELF-FUNDED (invest ₹P at ${s.invReturn}% for ${termYrs} yrs)</div>
+        <div style="font-size:.68rem;font-weight:700;color:#475569;letter-spacing:.05em;margin-bottom:.35rem">📈 VS SELF-FUNDED (invest ${inrK(s.selfAmt)} at ${s.invReturn}% for ${termYrs} yrs)</div>
         <div class="row">
-          <span class="lbl">₹P investment growth</span>
+          <span class="lbl">${inrK(s.selfAmt)} investment growth</span>
           <span class="val" style="color:var(--green)">+${inrK(s.invGains)}</span>
         </div>
         <div class="row">
@@ -1142,6 +1186,15 @@ function renderCards(scenarios, P, morM, repM, regime) {
           <span class="val" style="color:${loanWins?'var(--green)':'var(--red)'}">
             ${loanWins ? `+${inrK(adv)} 🏆 Loan wins` : `−${inrK(-adv)} Self-fund wins`}
           </span>
+        </div>
+        <div class="row" style="margin-top:.3rem;padding-top:.3rem;border-top:1px dashed var(--border)">
+          <span class="lbl" style="color:#475569">Breakeven investment return</span>
+          <span class="val" style="color:${breakevenColor};font-weight:700">${breakevenFmt}</span>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:.2rem">
+          ${s.invReturn >= breakeven
+            ? `Your ${s.invReturn}% return beats the ${breakevenFmt} breakeven — loan is advantageous`
+            : `Need ≥ ${breakevenFmt} on investments for loan to be advantageous`}
         </div>
       </div>`;
       })() : ''}
@@ -1166,14 +1219,15 @@ function renderChart(scenarios, P) {
   ctx.scale(dpr, dpr);
   const W = parentW, H = H_CSS;
 
-  const pad = { top: 48, right: 24, bottom: 86, left: 80 };
+  const pad = { top: 20, right: 24, bottom: 86, left: 80 };
   const cW  = W - pad.left - pad.right;
   const cH  = H - pad.top  - pad.bottom;
 
-  // Gross costs & net costs
-  const gross  = scenarios.map(s => P + s.totalInt);
-  const net    = scenarios.map(s => P + s.netInt);
-  const maxVal = Math.max(...gross) * 1.12;
+  // Gross costs, net costs & effective cost after investment returns
+  const gross     = scenarios.map(s => P + s.totalInt);
+  const net       = scenarios.map(s => P + s.netInt);
+  const effective = scenarios.map(s => Math.max(0, P + s.netInt - (s.invGains || 0)));
+  const maxVal    = Math.max(...gross) * 1.12;
 
   // ─── Grid & Y-axis ───
   ctx.font = '11px -apple-system,BlinkMacSystemFont,sans-serif';
@@ -1191,11 +1245,13 @@ function renderChart(scenarios, P) {
   // ─── Bars ───
   const scenColors  = ['#3b82f6','#10b981','#f59e0b'];
   const netColors   = ['#93c5fd','#6ee7b7','#fcd34d'];
+  const invColors   = ['#22c55e','#22c55e','#22c55e'];
   const groupW      = cW / 3;
-  const bW          = groupW * 0.32;
+  const bW          = groupW * 0.22;
+  const gap         = 5;
 
   scenarios.forEach((s, i) => {
-    const gX    = pad.left + i * groupW + (groupW - 2*bW - 6) / 2;
+    const gX = pad.left + i * groupW + (groupW - 3*bW - 2*gap) / 2;
 
     // Gross bar
     const gH = (gross[i] / maxVal) * cH;
@@ -1209,19 +1265,29 @@ function renderChart(scenarios, P) {
     const nH = (net[i] / maxVal) * cH;
     const nY = pad.top + cH - nH;
     ctx.fillStyle = netColors[i];
-    ctx.fillRect(gX + bW + 6, nY, bW, nH);
+    ctx.fillRect(gX + bW + gap, nY, bW, nH);
+
+    // Effective Cost bar (net − investment gains)
+    const eH = (effective[i] / maxVal) * cH;
+    const eY = pad.top + cH - eH;
+    ctx.fillStyle   = invColors[i];
+    ctx.globalAlpha = 0.75;
+    ctx.fillRect(gX + 2*(bW + gap), eY, bW, eH);
+    ctx.globalAlpha = 1;
 
     // Labels above bars
     ctx.fillStyle = '#1e293b';
     ctx.textAlign = 'center';
     ctx.font      = 'bold 10px -apple-system,sans-serif';
-    ctx.fillText(inrK(gross[i]), gX + bW/2, gY - 5);
+    ctx.fillText(inrK(gross[i]),     gX + bW/2,                    gY - 5);
     ctx.font      = '9px -apple-system,sans-serif';
     ctx.fillStyle = '#475569';
-    ctx.fillText(inrK(net[i]),   gX + bW + 6 + bW/2, nY - 5);
+    ctx.fillText(inrK(net[i]),       gX + bW + gap + bW/2,         nY - 5);
+    ctx.fillStyle = '#15803d';
+    ctx.fillText(inrK(effective[i]), gX + 2*(bW + gap) + bW/2,     eY - 5);
 
-    // Scenario label
-    const midX = gX + bW + 3;
+    // Scenario label (centred on middle bar)
+    const midX = gX + bW + gap + bW/2;
     ctx.font      = '11px -apple-system,sans-serif';
     ctx.fillStyle = '#475569';
     ctx.textAlign = 'center';
@@ -1245,22 +1311,22 @@ function renderChart(scenarios, P) {
   ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'left'; ctx.font = '10px sans-serif';
   ctx.fillText('Self-funded baseline (Principal only): ' + inrK(P), pad.left + 4, pLineY - 4);
 
-  // ─── Legend ───
-  const leg = [
-    { color: '#64748b', alpha: 0.8, label: 'Gross Cost (Principal + Total Interest)' },
-    { color: '#cbd5e1', alpha: 1,   label: 'Net Cost (after 80E tax savings)'        },
-    { color: '#94a3b8', alpha: 1,   label: 'Self-funded baseline'                    }
+  // ─── HTML Legend (rendered outside canvas) ───
+  const legItems = [
+    { color: '#64748b', alpha: '0.8',  label: 'Gross Cost (Principal + Interest)' },
+    { color: '#cbd5e1', alpha: '1',    label: 'Net Cost (after 80E savings)'       },
+    { color: '#22c55e', alpha: '0.75', label: 'Effective Cost (after Inv. Return)' },
+    { color: '#94a3b8', alpha: '1',    label: 'Self-funded baseline (dashed line)' }
   ];
-  let lx = pad.left;
-  ctx.font = '11px -apple-system,sans-serif'; ctx.textAlign = 'left';
-  leg.forEach(({ color, alpha, label }) => {
-    ctx.fillStyle = color; ctx.globalAlpha = alpha;
-    ctx.fillRect(lx, 14, 13, 12);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#475569';
-    ctx.fillText(label, lx + 17, 24);
-    lx += ctx.measureText(label).width + 36;
-  });
+  const legEl = document.getElementById('chartLegend');
+  if (legEl) {
+    legEl.innerHTML = legItems.map(({ color, alpha, label }) =>
+      `<span style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;">
+        <span style="display:inline-block;width:13px;height:12px;background:${color};opacity:${alpha};border-radius:2px;"></span>
+        ${label}
+      </span>`
+    ).join('');
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1641,10 +1707,11 @@ function resetPrepay(type) {
 function refreshScenariosAndChart() {
   if (!_calcState.gross) return;
   const { P, morM, repM } = _loanParams;
-  const { gross, regime, invReturn, loanStartYear, loanStartMonth } = _calcState;
+  const { gross, regime, invReturn, loanStartYear, loanStartMonth, selfAmt: selfAmtState } = _calcState;
+  const selfAmt    = selfAmtState || P;
   const repayYrs   = repM / 12;
   const totalM     = morM + repM;
-  const invGains   = calcInvGains(P, invReturn, totalM);
+  const invGains   = calcInvGains(selfAmt, invReturn, totalM);
 
   const totalPrepaid = Object.values(_prepayments['immediate'] || {}).reduce((s,v) => s+(v||0), 0);
 
@@ -1670,7 +1737,7 @@ function refreshScenariosAndChart() {
       ...immEff,
       baseTotalInt: _schedules.immediate.totalInt, baseEmiAfter: _schedules.immediate.emiAfter, totalPrepaid,
       savings: imm80E.total, netInt: immEff.totalInt - imm80E.total,
-      invGains, invReturn
+      invGains, invReturn, selfAmt
     },
     {
       key: 'psi', name: 'PSI + EMI',
@@ -1678,7 +1745,7 @@ function refreshScenariosAndChart() {
       ...psiEff,
       baseTotalInt: _schedules.psi.totalInt, baseEmiAfter: _schedules.psi.emiAfter, totalPrepaid,
       savings: psi80E.total, netInt: psiEff.totalInt - psi80E.total,
-      invGains, invReturn
+      invGains, invReturn, selfAmt
     },
     {
       key: 'deferred', name: 'Full Deferral',
@@ -1686,7 +1753,7 @@ function refreshScenariosAndChart() {
       ...defEff,
       baseTotalInt: _schedules.deferred.totalInt, baseEmiAfter: _schedules.deferred.emiAfter, totalPrepaid,
       savings: def80E.total, netInt: defEff.totalInt - def80E.total,
-      invGains, invReturn
+      invGains, invReturn, selfAmt
     }
   ];
 
